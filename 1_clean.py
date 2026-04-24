@@ -128,9 +128,9 @@ print(df["age_"].value_counts().sort_index())
 #เพศของคุณ
 
 gender_ = {
-    'ชาย': 1,
+    'ชาย': 3,
     'หญิง': 2,
-    'อื่นๆ': 3
+    'อื่นๆ': 1
 }
 
 df['gender'] = df['gender'].map(gender_).fillna(3)
@@ -180,7 +180,7 @@ def cat_kind(text):
     if any(k in text for k in ['เปอร์เซีย', 'persian', 'british', 'บริติช', 'ragdoll', 'scottish', 'scotish', 'สก็อต',  'สก๊อต', 'สกอตต', 'munchkin', 'มัชกิ้น', 'มัชกิน', 'short', 'hair', 'shorthair', 'เมนคูน', 'dsh',  'แรคดอล', 'หิมาลายัน', 'exotic', 'อเมริกัน', 'american', 'ragamuffin']):
         found.append('inter')
 
-    if any(k in text for k in ['ไทย', 'thai', 'วิเชียร', 'ขาวมณี', 'โกนจา', 'ศุภลักษณ์', 'โคราช', 'สีสวาท', 'พื้นเมือง']):
+    if any(k in text for k in ['ไทย', ' thai', 'วิเชียร', 'ขาวมณี', 'โกนจา', 'ศุภลักษณ์', 'โคราช', 'สีสวาท', 'พื้นเมือง']):
         found.append('thai')
 
     if any(k in text for k in ['ผสม', 'mix', 'จร', 'บ้าน', 'สลิด', 'ทาง', 'วัด', 'เก็บมาเลี้ยง', 'สามสี', 'ลายปลานิล', 'ธรรมดา']):
@@ -215,7 +215,7 @@ def brand(text):
     if any(k in text for k in ['whiskas', 'wishkas', 'วิสกัส', 'วิสคัส', 'วิสกัต', 'friskies', 'ฟริสกี้', 'โอลิเวอร์', 'ฮีโร่', 'zoi cat', 'betagro', 'เบทราโกร', 'เบทาโกร', 'maxima', 'แม็กซิม่า']): 
         found.append('low') 
         
-    return found if len(found) > 0 else ['Other']
+    return found if len(found) > 0 else ['other']
 
 df['brand_list'] = df['brand_4'].apply(brand)
 df_exploded_4 = df.explode('brand_list')
@@ -377,7 +377,7 @@ def add_pkg(text):
     if any(k in text for k in ['ซิป', 'zip', 'กล่อง', 'ถุงใส','ที่หนีบ', 'ฝา', 'ปิด', 'เปิด', 'เก็บ', 'ถุง']):
         found.append('packaging')
 
-    if any(k in text for k in ['โซเดียม', 'โปรตีน', 'วัตถุดิบ', 'ส่วนผสม', 'สูตร', 'สารอาหาร', 'คุณค่า', 'ไขมัน', 'aafco', 'ปริมาณ', 'คุณสมบัติ', 'วิตามิน', 'สุขภาพ', 'ก้อนขน', 'ไต', 'ตับ', 'ข้อต่อ', 'probiotic', 'ขน', 'โรค', 'ลด']):
+    if any(k in text for k in ['โซเดียม', 'สัญลักษณ์', 'โปรตีน', 'วัตถุดิบ', 'ส่วนผสม', 'สูตร', 'สารอาหาร', 'คุณค่า', 'ไขมัน', 'aafco', 'ปริมาณ', 'คุณสมบัติ', 'วิตามิน', 'สุขภาพ', 'ก้อนขน', 'ไต', 'ตับ', 'ข้อต่อ', 'probiotic', 'ขน', 'โรค', 'ลด']):
         found.append('quality')
 
     if any(k in text for k in ['ของแถม', 'ของเล่น', 'ลอตเตอรี่', 'ลุ้น', 'สุ่ม', 'topping', 'ก้านขน']):
@@ -559,8 +559,34 @@ print(df[top3_cols].sum().sort_values(ascending=False))
 
 #--------------------------------------------------------------------------------------
 
+mean_num = {'family': 3, 'friend': 2, 'pet': 1}
+df['mean_2'] = df['mean_2'].map(mean_num)
+
+#--------------------------------------------------------------------------------------
+
+df['cat_thai']  = df['kind_list'].apply(lambda x: 1 if 'thai' in str(x) else 0)
+df['cat_inter'] = df['kind_list'].apply(lambda x: 1 if 'inter' in str(x) else 0)
+df['cat_mixed'] = df['kind_list'].apply(lambda x: 1 if 'mixed' in str(x) else 0)
+
+#--------------------------------------------------------------------------------------
+
+df['price_premium'] = df['brand_list'].apply(lambda x: 1 if 'premium' in str(x) else 0)
+df['price_medium']  = df['brand_list'].apply(lambda x: 1 if 'medium' in str(x) else 0)
+df['price_low']     = df['brand_list'].apply(lambda x: 1 if 'low' in str(x) else 0)
+
+#--------------------------------------------------------------------------------------
+
+df['pkg_none']      = df['add_pkg_list'].apply(lambda x: 1 if 'none' in str(x) else 0)
+df['pkg_quality']   = df['add_pkg_list'].apply(lambda x: 1 if 'quality' in str(x) else 0)
+df['pkg_packaging'] = df['add_pkg_list'].apply(lambda x: 1 if 'packaging' in str(x) else 0)
+df['pkg_gift']      = df['add_pkg_list'].apply(lambda x: 1 if 'gift' in str(x) else 0)
+df['pkg_other']     = df['add_pkg_list'].apply(lambda x: 1 if 'other' in str(x) else 0)
+
+#--------------------------------------------------------------------------------------
+
 #ลบคอลัมเก่าออก
-df = df.drop(columns=['had_none_1', 'cat_mean_2', 'cat_kind_3', 'brand_4', 'add_pkg_20', 'num_1', 'top_3', 'เมื่อนึกถึงบรรจุภัณฑ์อาหารแมวที่โดดเด่นและสะดุดตา คุณคิดถึงแบรนด์ใดเป็นอันดับแรก เพราะอะไร [โปรดพิมพ์ชื่อแบรนด์และเหตุผล]'  # open-ended ไม่ได้ encode
+df = df.drop(columns=['had_none_1', 'cat_mean_2', 'cat_kind_3', 'brand_4', 'add_pkg_20', 'num_1', 'top_3', 'เมื่อนึกถึงบรรจุภัณฑ์อาหารแมวที่โดดเด่นและสะดุดตา คุณคิดถึงแบรนด์ใดเป็นอันดับแรก เพราะอะไร [โปรดพิมพ์ชื่อแบรนด์และเหตุผล]',
+                      'kind_list', 'brand_list', 'add_pkg_list'
 ])
 
 #--------------------------------------------------------------------------------------
