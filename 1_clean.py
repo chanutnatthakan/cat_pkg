@@ -42,6 +42,7 @@ new_name = {
     'Option 2 คุณคิดเห็นอย่างไรกับการออกแบบบรรจุภัณฑ์นี้  [รูู้สึกโดดเด่นและแตกต่างจากแบรนด์อื่นๆ]': 'opt2_unique',
     'Option 2 คุณคิดเห็นอย่างไรกับการออกแบบบรรจุภัณฑ์นี้  [รู้สึกว่าสินค้าพรีเมียม คุณภาพดี]': 'opt2_premium',
     'Option 2 คุณคิดเห็นอย่างไรกับการออกแบบบรรจุภัณฑ์นี้  [รู้สึกถึงรสชาติที่ดีกลมกล่อม แมวจะชอบทาน]': 'opt2_taste',
+
     'Option 2 คุณคิดเห็นอย่างไรกับการออกแบบบรรจุภัณฑ์นี้  [รู้สึกว่าเป็นดีไซน์ที่เหมาะกับตัวฉัน]': 'opt2_personal',
 #--------------------------------------------------------------------------------------
     'Option 3 คุณคิดเห็นอย่างไรกับการออกแบบบรรจุภัณฑ์นี้  [รู้สึกอยากซื้อสินค้า]': 'opt3_buy',
@@ -197,30 +198,55 @@ print("---- ประเภทแมวทั้งหมด ----")
 print(df_explode_3['kind_list'].value_counts())
 
 #--------------------------------------------------------------------------------------
-#ปัจจุบันคุณซื้ออาหารแมวสำเร็จรูปชนิดเม็ดแบรนด์ใด[โปรดพิมพ์ระบุ] แบ่งตามกก.
+#ปัจจุบันคุณซื้ออาหารแมวสำเร็จรูปชนิดเม็ดแบรนด์ใด[โปรดพิมพ์ระบุ]
+
+def name_brand(text):
+    text = str(text).lower().strip()
+    
+    brand_map = {'king cat': ['คิงส์แคทส์', 'คิงส์แคท', 'คิงแคท', 'คิงงแคท', 'คิง แคท', 'king cot', 'king catt', 'kingcat', 'kingkat', 'king kat'],
+                 'you-o': ['ยูโอ', 'youo', 'you-o gold', 'you o', 'YOU-O Gold'],
+                 'purino': ['พูริโน่', 'พูริโน', 'ภูริโน', 'purena', 'purino neo','พูริโน่นีโอ', 'PURINO', 'พูริโน่'],
+                 'whiskas': ['วิสกัส', 'วิสคัส', 'วิสกัต', 'wishkas', 'วิสกัสรสปลาทูน่า'],
+                 'kaniva': ['แคทิวา', 'แคทิว่า', 'แคททิวา', 'cativa', 'kativa', 'Katival'],
+                 'friskies': ['ฟริสกี้'],
+                 'betagro': ['เบทราโกร', 'เบทาโกร'],
+                 'projen': ['โปรเจน'],
+                 'cheershare': ['เชียร์แชร์'],
+                 'maxima': ['แม็กซิม่า'],
+                 'wills': ["will's", 'will '],
+                 'allwell': ['all well', 'Allwell'],}
+    
+    for standard_name, variations in brand_map.items():
+        for v in variations:
+            text = text.replace(v, standard_name)
+            
+    return text
+
+df['brand_4'] = df['brand_4'].apply(name_brand)
 
 def brand(text):
     text = str(text).lower()
     found = []
-    
-    #ราคา 250+ บาท/กก
-    if any(k in text for k in ['solid gold', 'taste of the wild', 'cheershare', 'เชียร์แชร์', 'bite of wild', 'proplan', 'real power', 'instinct', 'wellness core', 'teste', 'wellnsss']): 
-        found.append('premium') 
 
-    #ราคา 120-250 บาท/กก
-    if any(k in text for k in ['king', 'คิง', 'kat', 'wills', 'will', 'purino', 'purina', 'พูริโน', 'ภูริโน', 'projen', 'โปรเจน', 'petheria', 'pateria', 'kativa', 'kaniva', 'แคทิวา', 'แคททิวา', 'แคทิว่า', 'holistic', 'you-o', 'youo', 'ยูโอ', 'buzz', 'perfecta', 'tiffany', 'neez', 'justino', 'mekko', 'smartbrain', 'ostech']): 
-        found.append('medium') 
+    if 'king cat'          in text: found.append('king cat')
+    if 'purino'            in text: found.append('purino')
+    if 'you-o'             in text: found.append('you-o')
+    if 'kaniva'            in text: found.append('kaniva')
+    if 'whiskas'           in text: found.append('whiskas')
+    if 'buzz'              in text: found.append('buzz')
+    if 'projen'            in text: found.append('projen')
+    if 'friskies'          in text: found.append('friskies')
+    if 'solid gold'        in text: found.append('solid gold')
+    if 'cheershare'        in text: found.append('cheershare')
+    if 'taste of the wild' in text: found.append('taste of the wild')
+    if 'petheria'          in text: found.append('petheria')
 
-    #ราคาไม่เกิน 120 บาท/กก
-    if any(k in text for k in ['whiskas', 'wishkas', 'วิสกัส', 'วิสคัส', 'วิสกัต', 'friskies', 'ฟริสกี้', 'โอลิเวอร์', 'ฮีโร่', 'zoi cat', 'betagro', 'เบทราโกร', 'เบทาโกร', 'maxima', 'แม็กซิม่า']): 
-        found.append('low') 
-        
     return found if len(found) > 0 else ['other']
 
 df['brand_list'] = df['brand_4'].apply(brand)
 df_exploded_4 = df.explode('brand_list')
 
-print("---- การซื้ออาหารแต่ละแบรนด์ในตลาด(แบ่งตามช่วงราคา) ----")
+print("---- แบรนด์ที่คนซื้อทั้งหมด ----")
 print(df_exploded_4['brand_list'].value_counts())
 
 #--------------------------------------------------------------------------------------
@@ -570,12 +596,6 @@ df['cat_mixed'] = df['kind_list'].apply(lambda x: 1 if 'mixed' in str(x) else 0)
 
 #--------------------------------------------------------------------------------------
 
-df['price_premium'] = df['brand_list'].apply(lambda x: 1 if 'premium' in str(x) else 0)
-df['price_medium']  = df['brand_list'].apply(lambda x: 1 if 'medium' in str(x) else 0)
-df['price_low']     = df['brand_list'].apply(lambda x: 1 if 'low' in str(x) else 0)
-
-#--------------------------------------------------------------------------------------
-
 df['pkg_none']      = df['add_pkg_list'].apply(lambda x: 1 if 'none' in str(x) else 0)
 df['pkg_quality']   = df['add_pkg_list'].apply(lambda x: 1 if 'quality' in str(x) else 0)
 df['pkg_packaging'] = df['add_pkg_list'].apply(lambda x: 1 if 'packaging' in str(x) else 0)
@@ -586,7 +606,7 @@ df['pkg_other']     = df['add_pkg_list'].apply(lambda x: 1 if 'other' in str(x) 
 
 #ลบคอลัมเก่าออก
 df = df.drop(columns=['had_none_1', 'cat_mean_2', 'cat_kind_3', 'brand_4', 'add_pkg_20', 'num_1', 'top_3', 'เมื่อนึกถึงบรรจุภัณฑ์อาหารแมวที่โดดเด่นและสะดุดตา คุณคิดถึงแบรนด์ใดเป็นอันดับแรก เพราะอะไร [โปรดพิมพ์ชื่อแบรนด์และเหตุผล]',
-                      'kind_list', 'brand_list', 'add_pkg_list'
+                      'kind_list', 'add_pkg_list'
 ])
 
 #--------------------------------------------------------------------------------------
